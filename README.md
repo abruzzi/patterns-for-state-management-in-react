@@ -1,22 +1,22 @@
 # patterns-for-state-management-in-react
 
-Managing state in UI applications are challenging. Part of the reason is that there are many states to manage, local states like `isOpen` or `selectedIndex`, states indicators like `loading`, `error` for a async call is a bit tricker, and the state that represent a copy of the remote state is the hardest (because you will need to consider cache, retry, steal state, etc).
+Managing state in UI applications is a challenging endeavor. A part of this challenge stems from the many states one needs to manage. There are local states like `isOpen` or `selectedIndex`, states representing remote data like `loading`, `error`, `data`, and environmental states such as router paths, `isUserAuthorized`, and configurations like feature flags to determine the availability of certain features to the user.
 
-And developers have tried different ways to cope with the challenge since the very begining, library like `redux` and `mobx` tried to solve the problem and ended up introduce a few others, same things goes to the old context API (thus the introduce of the new version), and then `react-query`, `remix`, etc raised to simplify some of the hard issues.
+Over time, developers have explored various strategies to tackle these challenges. Libraries like `redux` and `mobx` emerged as solutions, although they brought along their own set of problems. Similar issues befell the old context API, leading to the introduction of the new context API. Following that, libraries like `react-query`, `remix`, and others came up, each attempting to simplify certain complexities.
 
-Apart from the delicated libraries, there are also some patterns people turned to use for managing the states - the container presentation components, higer-order component, hooks, etc. are all have a role to play in the solution and problem domain.
+With specialized libraries targeting different aspects of state management, progress has been made. For instance, `react-query` significantly alleviates the challenges tied to asynchronous calls by providing features like caching, deduplication, retries, and error handling. Moreover, patterns like container/presentation components, higher-order components, and hooks have been adopted by developers to manage state. Each of these patterns has a role to play in both the problem and solution domains.
 
-In this article, I would like to discuss a bit more on the fundamental problems and different patterns, some were pretty useful and still valid today, while others might be a bit akward and I would suggest you to avoid in your future projects. And I also would like to purpose a pattern that I found pretty useful - especailly for the large and complicated UI applications.
+However, amidst these varying approaches, understanding the core problem and the rationale behind these solutions is crucial. It's relatively straightforward to follow a new pattern, but a deeper understanding of the 'why' behind these patterns will enable you to apply them more confidently in your specific use cases.
 
-Let's step back a little bit and start with a simple concept: higher-order function to start our journey.
+This article aims to delve into the fundamental problems and explore the various patterns that have evolved over time. Some of these patterns have stood the test of time and remain relevant, while others may have become somewhat awkward and are better avoided in future projects. Moreover, I'd like to propose a pattern that I've found to be particularly beneficial, especially for large and complex UI applications.
+
+With that in mind, let's take a step back, maybe grab a coffee, and start with a basic yet powerful concept—higher-order functions (HOFs), setting the stage for our explorative journey into state management in React. 
 
 ## Higher order function
 
-Higher-order funciton is a concept from functioanl programming, it means a function that takes or returns another function, or both. It might be a little bit confusing at the begining, especially if you started from a traditional object-oriented language that doesn't support it.
+A higher-order function (HOF) is a concept borrowed from functional programming. It refers to a function that either accepts another function as an argument, returns a function, or both. This idea might initially seem perplexing, especially if you're coming from a traditional object-oriented programming background where this concept isn't as prevalent.
 
-But in many cases it's a useful tool. For example, let's 
-
-Say we have a function that print out an item's name and it's price:
+However, higher-order functions are incredibly useful tools in many scenarios. To illustrate, let’s consider a function, `printLineItem`, which outputs an item's name alongside its price:
 
 ```ts
 const printLineItem = (item) => {
@@ -24,7 +24,7 @@ const printLineItem = (item) => {
 };
 ```
 
-and we also want to print 
+Suppose you have an array of items:
 
 ```ts
 const items = [
@@ -34,10 +34,10 @@ const items = [
 
 console.log(printLineItem(items[0]));
 
-// Name: Apple - Price: $1
+// Output: Name: Apple - Price: $1
 ```
 
-And we would like to add a few more details as a header of the report, we can create a function called `withHeader`. It takes a function as input, and returns another function.
+Now, let's say you want to add a header to this output, to better structure the information. You could achieve this by creating a higher-order function named `withHeader`. This function accepts another function (`contentFunc`) as an argument and returns a new function:
 
 ```ts
 const withHeader = (contentFunc) => {
@@ -48,12 +48,20 @@ const withHeader = (contentFunc) => {
 };
 ```
 
-Then we could call `withHeader` with `printLineItem`:
+Now you can pass `printLineItem` to `withHeader`, which in turn, returns a new function. This new function, when called, will output the item information prefixed with a header:
 
 ```ts
 const report = withHeader(printLineItem);
-report(items[0]);
+console.log(report(items[0]));
+
+// Output:
+// === Header ===
+// Name: Apple - Price: $1
 ```
+
+In this example, `withHeader` is a higher-order function that wraps around `printLineItem` to enhance its functionality, demonstrating a simple yet effective way to compose functions and extend their behavior.
+
+Expanding on our initial example, let's introduce a bit more complexity to showcase the power and flexibility of higher-order functions.
 
 ```ts
 const printLineItem = (item) => {
@@ -71,29 +79,9 @@ const items = [
   { name: 'Apple', price: 1 },
   { name: 'Banana', price: 0.75 },
 ];
-
-const withFooter = (contentFunc) => {
-  return (...args) => {
-    const footer = "\n=== Footer ===";
-    return contentFunc(...args) + footer;
-  };
-};
-
-const printAllItems = (items) => items.map(printLineItem).join('\n');
-
-const report = withFooter(withHeader(printAllItems));
-
-console.log(report(items));
 ```
 
-And the output would be enhanced with a header:
-
-```ts
-=== Header ===
-Name: Apple - Price: $1
-```
-
-Similiarly we could define another function `withFooter`, and wrap the resulting report to a new function:
+Now, just as we created a `withHeader` function to add a header, let's create a `withFooter` function to append a footer to our output:
 
 ```ts
 const withFooter = (contentFunc) => {
@@ -102,39 +90,52 @@ const withFooter = (contentFunc) => {
     return contentFunc(...args) + footer;
   };
 };
+```
 
+We can now wrap `printLineItem` with both `withHeader` and `withFooter` to generate a detailed report for a single item:
+
+```ts
 const report = withFooter(withHeader(printLineItem));
 console.log(report(items[0]));
+
+// Output:
+// === Header ===
+// Name: Apple - Price: $1
+// === Footer ===
 ```
 
-And the above would generate result like so:
+This composition enhances `printLineItem` without modifying its original implementation, showcasing the beauty of function composition. Furthermore, `withHeader` and `withFooter` remain agnostic to the nature of the wrapped function, a powerful feature of higher-order functions.
 
-```ts
-=== Header ===
-Name: Apple - Price: $1
-=== Footer ===
-```
-
-which means we're enhancing the `printLineItem` without modify it, that is a great way to compose different functionailties. And also the beatuful thing here is the `withHeader`, `withFooter` has zero knowledge of what is wrapped as well - meaning we could define a `report` function that can deal with multiple items without modify `withHeader` or `withFooger`
+Suppose now we want to generate a report for all items in the array. We can create a new function, `printAllItems`, to achieve this:
 
 ```ts
 const printAllItems = (items) => items.map(printLineItem).join('\n');
 
 const report = withFooter(withHeader(printAllItems));
-report(items);
+console.log(report(items));
+
+// Output:
+// === Header ===
+// Name: Apple - Price: $1
+// Name: Banana - Price: $0.75
+// === Footer ===
 ```
 
-In other words, everything are loosely coupled and thus can be composed freely. And then we started to wondering, can we do this in our React application too?
+By doing so, we've now created a report for multiple items without altering the implementations of `withHeader` or `withFooter`. This example exemplifies the loose coupling and composability inherent in higher-order functions. 
 
-And the anwser is yes. Just like the higher order function we defined here, we can define a higher-order component: a component accepts another as input and returns a enhanced version - thanks for React as all these component are simply functions.
+As we reflect on this, an intriguing question arises: Can we transfer this level of composability and functional elegance into our React applications? 
 
-## Higher-order components
+Indeed, the ability to enhance components is not exclusive to functions; we can achieve the same with React components, thanks to Higher-Order Components (HOCs). A Higher-Order Component is a function that takes a component as an argument and returns a new, enhanced component.
 
-The idea of Higer-order components is simple, and it's useful when you need to inject some enhancement to a original component. For example, 
+## Higher-order Components
+
+The principle behind Higher-order Components (HOCs) is straightforward: they allow you to inject additional functionality into an existing component. This pattern is especially beneficial when you want to reuse certain behaviors across multiple components.
+
+Let's delve into an example:
 
 ```tsx
 const checkAuthorization = () => {
-    //checking local storage or send request to remote 
+    // Perform authorization check, e.g., check local storage or send a request to a remote server
 }
 
 const withAuthorization = (Component: React.FC): React.FC => {
@@ -145,23 +146,25 @@ const withAuthorization = (Component: React.FC): React.FC => {
 };
 ```
 
-And for some page we don't want to expose to anyone directly, say a `Profile` page, we can wrap the component with `withAuthorization`:
+In this snippet, we define a function `checkAuthorization` to handle the authorization check. Next, we create a Higher-Order Component `withAuthorization`. This HOC takes a component (`Component`) as its argument and returns a new function. This returned function, when rendered, will either render the original `Component` (if the user is authorized) or a `Login` component (if the user is not authorized).
+
+Now, suppose we have a `ProfileComponent` that we want to secure. We can use `withAuthorization` to create a new, secured version of `ProfileComponent`:
 
 ```tsx
 const Profile = withAuthorization(ProfileComponent);
 ```
 
-<!-- 
-If you have experiences on `redux`, the above code snippet should recall some of your memory like 
+Now, whenever `Profile` is rendered, it will first check if the user is authorized. If so, it renders `ProfileComponent`; otherwise, it redirects the user to the `Login` component.
 
-```tsx
-export default connect(mapStateToProps)(TheActualComponent);
-```
+Now that we've seen how higher-order components can control access with `withAuthorization`, let's shift our focus to enhancing user interactions. We'll delve into an `ExpandablePanel` component, showcasing how higher-order components can also manage interactive UI elements and state transitions.
 
-Essentially, connect is a higher-order function that returns a higher-order component. The higher-order component wraps around `TheActualComponent``, passing down additional props derived from the Redux store state via `mapStateToProps`. This syntax is a form of function composition, allowing `TheActualComponent` to access and interact with the Redux store while keeping the component itself decoupled from Redux. -->
+## ExpandablePanel component
 
+Let's kick things off with a basic ExpandablePanel component. This component, as the name suggests, consists of a title and a content area. Initially, the content area is collapsed, but with a click on the title, it expands to reveal the content.
 
-Let's start with a simple ExpandablePanel component. The panel has a title and a content, normally the content is collpased, and it expands after a click. The implementation is straightforword:
+![An expandable panel](images/expandable-panel.png)
+
+The code for such a component is straightforward:
 
 ```tsx
 export type PanelProps = {
@@ -181,7 +184,7 @@ const ExpandablePanel = ({ heading, content }: PanelProps) => {
 };
 ```
 
-Now let's think about a feature that we want the panel to expand by default and will auto close in a few seconds. We could modify the existing code pretty easily:
+Now, suppose we want to jazz it up a bit: make the panel expand automatically when rendered, and then collapse after a few seconds. Here's how we could adjust the code to achieve that:
 
 ```tsx
 const AutoCloseExpandablePanel = ({ heading, content }: PanelProps) => {
@@ -206,52 +209,51 @@ const AutoCloseExpandablePanel = ({ heading, content }: PanelProps) => {
 };
 ```
 
-*Explain the code a bit*
+In this revised version, we initialize `isOpen` to `true` so the panel starts expanded. Then we utilize `useEffect` to set a timer that collapses the panel after 3000 milliseconds (3 seconds).
 
-This is pretty common ui pattern, for example we might need close an notification automatically, an alert, a tooltip, etc. So we can try to move this logic into a common place that other component can reuse.
-
-```tsx
-const withAutoClose =
-  <T extends Partial<Toggleable>>(
-    Component: React.FC<T>,
-    duration: number = 2000
-  ) =>
-  (props: T) => {
-    const [show, setShow] = useState<boolean>(true);
-
-    useEffect(() => {
-      if (show) {
-        const timerId = setTimeout(() => setShow(false), duration);
-        return () => clearTimeout(timerId);
-      }
-    }, [show]);
-
-    return (
-      <Component
-        {...props}
-        isOpen={show}
-        toggle={() => setShow((show) => !show)}
-      />
-    );
-  };
-
-```
-
-*explain a bit*, note the type definition here and the default value of the show.
+This pattern of auto-collapsing components is quite common in UI development - think of notifications, alerts, or tooltips that disappear after a while. To promote code reusability, let's extract this auto-collapsing logic into a Higher-Order Component:
 
 ```tsx
-export interface Toggleable {
+interface Toggleable {
   isOpen: boolean;
   toggle: () => void;
 }
 
-export type PanelProps = {
+const withAutoClose = <T extends Partial<Toggleable>>(
+  Component: React.FC<T>,
+  duration: number = 2000
+) => (props: T) => {
+  const [show, setShow] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (show) {
+      const timerId = setTimeout(() => setShow(false), duration);
+      return () => clearTimeout(timerId);
+    }
+  }, [show]);
+
+  return (
+    <Component
+      {...props}
+      isOpen={show}
+      toggle={() => setShow((show) => !show)}
+    />
+  );
+};
+```
+
+In `withAutoClose`, we define a generic HOC that adds auto-closing functionality to any component. This HOC accepts a `duration` parameter to customize the auto-close delay, defaulting to 2000 milliseconds (2 seconds).
+
+To ensure a smooth integration, we extend `PanelProps` to include optional `Toggleable` properties:
+
+```tsx
+type PanelProps = {
   heading: string;
   content: ReactNode;
 }  & Partial<Toggleable>;
 ```
 
-Correspondingly, we will change ExpandablePanel to a stateless component, all the state control will be passed from the higher-order component `withAutoClose`:
+Now, we can refactor `ExpandablePanel` to accept `isOpen` and `toggle` props from `withAutoClose`:
 
 ```tsx
 const ExpandablePanel = ({
@@ -269,20 +271,22 @@ const ExpandablePanel = ({
 };
 ```
 
-And the AutoCloseExpandablePanel can be defined as:
+With this setup, creating an auto-closing version of `ExpandablePanel` is a breeze:
 
 ```tsx
 export default withAutoClose(ExpandablePanel, 3000);
 ```
 
-And we then can re-use such logic in many places like:
+And guess what? The auto-closing logic we've encapsulated in `withAutoClose` can be reused across various components:
 
 ```tsx
 const AutoDismissToast = withAutoClose(Toast, 3000);
 const TimedTooltip = withAutoClose(Tooltip, 3000);
 ```
 
-The beautiful part of Higher-Order component is that it can be composed - you can use a hoc with the result of another hoc. Say, we have another hook `withKeyboardToggle` that allows you to use keyboard to expand or collpase a panel
+The versatility of Higher-Order Components (HOCs) shines when it comes to composition - the ability to apply one HOC to the result of another. This capability aligns well with the principle of function composition in functional programming. Let's consider another HOC, `withKeyboardToggle`, which augments a panel's behavior to respond to keyboard inputs for toggling the panel's expanded/collapsed state.
+
+Here's the code for `withKeyboardToggle`:
 
 ```tsx
 const noop = () => {};
@@ -313,17 +317,21 @@ const withKeyboardToggle =
 export default withKeyboardToggle;
 ```
 
-And then you can compose the two like so:
+In the `withKeyboardToggle` HOC, a reference (`divRef`) is created for the wrapping `div` to enable keyboard interactions. The `handleKeyDown` function defines the behavior for the Enter, Space, and Escape keys. The Enter or Space keys toggle the panel's state, while the Escape key removes focus from the panel.
+
+Now, let's compose `withKeyboardToggle` and `withAutoClose` together to create a new component `AccessibleAutoClosePanel`:
 
 ```tsx
 const AccessibleAutoClosePanel = withAutoClose(withKeyboardToggle(ExpandablePanel), 2000);
 ```
 
-*Some Examples are needed here*
+In the expression `withAutoClose(withKeyboardToggle(ExpandablePanel), 2000);`, `withKeyboardToggle` is first applied to `ExpandablePanel`, enhancing it with keyboard toggle capability. The result is then fed into `withAutoClose`, which further enhances the component to auto-close after a 2000 millisecond delay. This chaining of HOCs results in a new component, `AccessibleAutoClosePanel`, which inherits both the keyboard toggle and auto-close behaviors. This is a vivid example of how HOCs can be nested and composed to build more complex behavior from simpler, single-responsibility components.
 
 ![Higher Order Component](images/higher-order-component.png)
 
 And if you have some object-oriented programming experience, this should renosate you about the decorator design pattern. I assume you don't and I'll give you a simple example as a refresh, this pattern is important and we probabaly will see it again.
+
+---
 
 ## Decorator patterns
 
@@ -333,12 +341,34 @@ For example, espresso itself is a coffee, or we can see it implement the `Coffee
 
 ![Decorator](images/decorator-coffee.png)
 
+If we use class diagram to demonstrate the relationship of entities above, it would be something like the following. Note how the decorator and the wrapped class are all implementing the original `coffee` interface.
 
 ![Decorator](images/decorator-class-diagram.png)
+
+And each wrapper class can do exactly the same - and to the consumers it's still coffee.
+
+---
+
+Higher-Order Components (HOCs) are a powerful pattern for creating composable and reusable logic in your components. However, they come with their own set of advantages and drawbacks. Let's take a look:
+
+### Pros of Higher-Order Components:
+1. **Reusability:** HOCs enable you to extract and reuse common logic across multiple components, promoting DRY (Don't Repeat Yourself) principles.
+2. **Composition:** They thrive in a system that favors composition, allowing developers to create enhanced components by composing multiple HOCs together.
+3. **Separation of Concerns:** By isolating certain behaviors or logic into HOCs, they help in maintaining a clean separation of concerns.
+4. **Abstraction:** They provide a level of abstraction that can help in organizing higher-level logic, aiding in the manageability of the code.
+
+### Cons of Higher-Order Components:
+1. **Prop Collision:** There's a risk of prop name collisions, where the HOC might override the props of the wrapped component or vice versa.
+2. **Indirection:** They add layers of indirection to your component hierarchy, which might make debugging and maintenance more challenging.
+3. **Complexity:** The composition of multiple HOCs can lead to a 'wrapper hell', where components are wrapped in multiple layers of HOCs, making the code harder to understand and follow.
+
+Transitioning from Higher-Order Components, we now venture into Hooks — a newer and potent feature in React for handling state and effects in functional components. Up next, we'll unravel how Hooks provide a more straightforward approach to managing state and logic in your components.
 
 ## Hooks
 
 > ...With Hooks, you can extract stateful logic from a component so it can be tested independently and reused. Hooks allow you to reuse stateful logic without changing your component hierarchy...
+
+Hooks provide a means to extract stateful logic from a component, enabling its independent testing and reuse. They pave the way for reutilizing stateful logic without altering your component hierarchy. Essentially, Hooks let you "hook into" React state and other lifecycle features from function components.
 
 ```tsx
 const useAutoClose = (duration: number) => {
@@ -359,10 +389,11 @@ const useAutoClose = (duration: number) => {
 export default useAutoClose;
 ```
 
-To use the hook, we don't have to make too many changes to the original `ExpandablePanel`, we can embed the code in:
+In this `useAutoClose` hook, we create a state `isOpen` and a function `toggle` to switch the state. The `useEffect` function sets a timer to change `isOpen` to false after a specified duration, but only if `isOpen` is true. It also cleans up the timer to prevent memory leaks.
+
+Now, to integrate this hook into our `ExpandablePanel`, minimal amendments are needed:
 
 ```tsx
-
 const ExpandablePanel = ({ heading, content }: PanelProps) => {
   const { isOpen, toggle } = useAutoClose(2000);
 
@@ -374,8 +405,7 @@ const ExpandablePanel = ({ heading, content }: PanelProps) => {
   );
 };
 ```
-
-Note how little change we have to do here, and for the keyboard navigation, we could achieve it by do the following changes:
+The `ExpandablePanel` now utilizes `useAutoClose`, seamlessly incorporating the auto-close functionality. Next, to incorporate keyboard navigation, we define another hook, `useKeyboard`, which captures key events to toggle the panel:
 
 ```tsx
 const useKeyboard = (toggle: () => void) => {
@@ -390,7 +420,7 @@ const useKeyboard = (toggle: () => void) => {
 };
 ```
 
-And use it like the following:
+Embedding `useKeyboard` within `ExpandablePanel` is straightforward:
 
 ```tsx
 const ExpandablePanel = ({ heading, content }: PanelProps) => {
@@ -406,11 +436,13 @@ const ExpandablePanel = ({ heading, content }: PanelProps) => {
 };
 ```
 
-*explain the code a bit"
+Here, `handleKeyDown` from `useKeyboard` is employed to detect key presses, enhancing our component with keyboard interactivity.
 
 ![Using alternative hooks](images/hooks.png)
 
-*Describe a bit more on the benefits of hooks*
+Hooks embody a neat package of reusable logic, isolated from the component, yet easily integrated. Unlike the wrapping approach of HOCs, hooks offer a plug-in mechanism, making them lightweight and well-managed by React. This characteristic of hooks not only promotes code modularity but also facilitates a cleaner and more intuitive way to enrich our components with additional functionalities.
+
+---
 
 ## Implement a dropdown list
 
