@@ -329,23 +329,23 @@ In the expression `withAutoClose(withKeyboardToggle(ExpandablePanel), 2000);`, `
 
 ![Higher Order Component](images/higher-order-component.png)
 
-And if you have some object-oriented programming experience, this should renosate you about the decorator design pattern. I assume you don't and I'll give you a simple example as a refresh, this pattern is important and we probabaly will see it again.
+If you have some background in object-oriented programming, this concept might resonate with you as it aligns with the decorator design pattern. Assuming you may not be familiar, I'll provide a simple refresher on this pattern since it's fundamental and we'll likely encounter it again.
 
 ---
 
-## Decorator patterns
+## Decorator Pattern
 
-Essentaily, decorator means ...
+At its core, the Decorator Pattern allows us to extend or alter the functionality of objects at run-time by wrapping them in a layer of a decorative class. This pattern is quite handy when you wish to adhere to the Open/Closed Principle, making your code open for extension but closed for modification.
 
-For example, espresso itself is a coffee, or we can see it implement the `Coffee` interface in OO's term. And We could make a `MilkeCoffee` interface implement the `Coffee` while adding some alteration to it - without breaking the interface contract. And the under the `MilkCoffee` there are many variations, Soy Latte, Almod Flat White, etc.
+Let's draw an analogy to better understand this concept. Consider a simple espresso coffee. In Object-Oriented terms, espresso can be seen as an instance of a `Coffee` interface. Now, if you wish to have a milk coffee instead, you could create a `MilkCoffee` class that also implements the `Coffee` interface while adding a twist of milk to the basic espresso. This alteration is done without breaking the contract of the `Coffee` interface. Under the umbrella of `MilkCoffee`, you could have multiple variations like Soy Latte, Almond Flat White, etc., each extending the functionality of the basic espresso, yet adhering to the `Coffee` interface.
 
 ![Decorator](images/decorator-coffee.png)
 
-If we use class diagram to demonstrate the relationship of entities above, it would be something like the following. Note how the decorator and the wrapped class are all implementing the original `coffee` interface.
+A class diagram would further elucidate the relationship between these entities. As depicted below, both the decorator (MilkCoffee) and the original class (Espresso) implement the `Coffee` interface. Each wrapper class (e.g., Soy Latte, Almond Flat White) encapsulates the Espresso and extends its functionality while remaining a `Coffee` type.
 
 ![Decorator](images/decorator-class-diagram.png)
 
-And each wrapper class can do exactly the same - and to the consumers it's still coffee.
+Thus, regardless of how you choose to decorate your coffee, to the consumer, it remains a coffee. This pattern illustrates the essence of decorator pattern where each wrapper class enriches the functionality of the original class, all while preserving its original identity and contract.
 
 ---
 
@@ -442,7 +442,6 @@ Here, `handleKeyDown` from `useKeyboard` is employed to detect key presses, enha
 
 Hooks embody a neat package of reusable logic, isolated from the component, yet easily integrated. Unlike the wrapping approach of HOCs, hooks offer a plug-in mechanism, making them lightweight and well-managed by React. This characteristic of hooks not only promotes code modularity but also facilitates a cleaner and more intuitive way to enrich our components with additional functionalities.
 
----
 
 ## Implement a dropdown list
 
