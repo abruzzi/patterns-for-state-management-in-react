@@ -12,7 +12,7 @@ This article aims to delve into the fundamental problems and explore the various
 
 With that in mind, let's take a step back, maybe grab a coffee, and start with a basic yet powerful concept—higher-order functions (HOFs), setting the stage for our explorative journey into state management in React. 
 
-## Higher order function
+## Higher-order Function
 
 A higher-order function (HOF) is a concept borrowed from functional programming. It refers to a function that either accepts another function as an argument, returns a function, or both. This idea might initially seem perplexing, especially if you're coming from a traditional object-oriented programming background where this concept isn't as prevalent.
 
@@ -158,7 +158,7 @@ Now, whenever `Profile` is rendered, it will first check if the user is authoriz
 
 Now that we've seen how higher-order components can control access with `withAuthorization`, let's shift our focus to enhancing user interactions. We'll delve into an `ExpandablePanel` component, showcasing how higher-order components can also manage interactive UI elements and state transitions.
 
-## ExpandablePanel component
+### ExpandablePanel component
 
 Let's kick things off with a basic ExpandablePanel component. This component, as the name suggests, consists of a title and a content area. Initially, the content area is collapsed, but with a click on the title, it expands to reveal the content.
 
@@ -364,7 +364,7 @@ Higher-Order Components (HOCs) are a powerful pattern for creating composable an
 
 Transitioning from Higher-Order Components, we now venture into Hooks — a newer and potent feature in React for handling state and effects in functional components. Up next, we'll unravel how Hooks provide a more straightforward approach to managing state and logic in your components.
 
-## Hooks
+## React Hooks
 
 > ...With Hooks, you can extract stateful logic from a component so it can be tested independently and reused. Hooks allow you to reuse stateful logic without changing your component hierarchy...
 
@@ -442,18 +442,21 @@ Here, `handleKeyDown` from `useKeyboard` is employed to detect key presses, enha
 
 Hooks embody a neat package of reusable logic, isolated from the component, yet easily integrated. Unlike the wrapping approach of HOCs, hooks offer a plug-in mechanism, making them lightweight and well-managed by React. This characteristic of hooks not only promotes code modularity but also facilitates a cleaner and more intuitive way to enrich our components with additional functionalities.
 
+As we have explored hooks and their capabilities in managing state and logic, let's apply this knowledge to build a more complex UI component from scratch — a dropdown list. This exercise will not only reinforce our understanding of hooks but also demonstrate their practical application in creating interactive UI elements. 
 
-## Implement a dropdown list
+We'll start with a basic version of a dropdown list, then gradually introduce more features to make it functional and user-friendly. This process will also set the stage for a later discussion on headless components, showcasing a design pattern that further abstracts and manages state and logic in UI components.
 
-Dropdown list is a common component we use in many places. Althrough there is a native select component that can fit in many basic usages, a advanced version with more control for each option has better user experience.
+## Implementing a Dropdown List
+
+A dropdown list is a common component used in many places. Although there's a native select component for basic use cases, a more advanced version offering more control over each option provides a better user experience.
 
 ![Dropdown list component](images/illustration.png)
 
-But to implement one - I mean a completely implementation require a lot of efforts than it looks on the surface. Enable keyboard navigation, consider accessibility (screen readers for instance), usability in mobile devices, etc.
+Creating one from scratch, a complete implementation, requires more effort than it appears at first glance. It's essential to consider keyboard navigation, accessibility (for instance, screen reader compatibility), and usability on mobile devices, among others.
 
-We can start with a simple, desktop version that only supprt mouse clicks, and gradually build in more features to make it realistic. Note here the purpose is to reveal a few software design patterns other than teach how to build a dropdown list and use it in production - actually I don’t recommend you to do it and instead select some more mature libraries.
+We'll begin with a simple, desktop version that only supports mouse clicks, and gradually build in more features to make it realistic. Note that the goal here is to reveal a few software design patterns rather than teach how to build a dropdown list for production use - actually, I don’t recommend doing this from scratch and would instead suggest using more mature libraries.
 
-Essentially we need a element (let’s call it a trigger) for user to click, and a state to control weather show and hide of a list panel. Initially we hide the panel, and when trigger is clicked, we show the list panel.
+Basically, we need an element (let's call it a trigger) for the user to click, and a state to control the show and hide actions of a list panel. Initially, we hide the panel, and when the trigger is clicked, we show the list panel.
 
 ```jsx
 import { useState } from "react";
@@ -501,11 +504,9 @@ const Dropdown = ({ items }: DropdownProps) => {
 };
 ```
 
-*explain a bit about the code above.*
+In the code above, we've set up the basic structure for our dropdown component. Using the `useState` hook, we manage the `isOpen` and `selectedItem` states to control the dropdown's behavior. A simple click on the trigger toggles the dropdown menu, while selecting an item updates the `selectedItem` state.
 
-The code works fine, with a bit styling it pretty much act like a dropdown component. We could try to break it down to see it more clearly.
-
-We can extract a `Tigger` component for allowing use to click:
+Let's break down the component into smaller, manageable pieces to see it more clearly. We'll start by extracting a `Trigger` component to handle user clicks:
 
 ```tsx
 const Trigger = ({
@@ -523,7 +524,7 @@ const Trigger = ({
 };
 ```
 
-And for the list of items, we can extract a `DropdownMenu` component:
+Similarly, we'll extract a `DropdownMenu` component to render the list of items:
 
 ```tsx
 const DropdownMenu = ({
@@ -553,7 +554,7 @@ const DropdownMenu = ({
 };
 ```
 
-And finally in `Dropdown`, we simply use these two components, and pass in the corresponding state, this will make them purely a controlled component (stateless component).
+Now, in the `Dropdown` component, we simply use these two components, passing in the corresponding state, turning them into purely controlled components (stateless components).
 
 ```tsx
 const Dropdown = ({ items }: DropdownProps) => {
@@ -572,77 +573,37 @@ const Dropdown = ({ items }: DropdownProps) => {
 };
 ```
 
-*explain a bit about the code above.*
+In this updated code structure, we've separated concerns by creating specialized components for different parts of the dropdown, making the code more organized and easier to manage.
 
 ![List native implementation](images/list-native.png)
 
-## Implementing keyboard navigation
+---
 
-We need to listen to `onKeyDown` 
+## Implementing Keyboard Navigation
+
+Incorporating keyboard navigation within our dropdown list enhances the user experience by providing an alternative to mouse interactions. This is particularly important for accessibility and offers a seamless navigation experience on the web page. Let's explore how we can achieve this using the `onKeyDown` event handler.
+
+Initially, we'll attach a `handleKeyDown` function to the `onKeyDown` event in our `Dropdown` component. Here, we utilize a switch statement to determine the specific key pressed and perform actions accordingly. For instance, when the "Enter" or "Space" key is pressed, the dropdown is toggled. Similarly, the "ArrowDown" and "ArrowUp" keys allow navigation through the list items, cycling back to the start or end of the list when necessary.
 
 ```tsx
 const Dropdown = ({ items }: DropdownProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  // ... previous state variables ...
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     switch (e.key) {
-      case "Enter":
-      case " ":
-        e.preventDefault();
-        if (isOpen) {
-          setSelectedItem(items[selectedIndex]);
-          setIsOpen(false);
-        } else {
-          setIsOpen(true);
-        }
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        setSelectedIndex((prevIndex) => {
-          if (prevIndex === items.length - 1) {
-            return 0;
-          } else {
-            return prevIndex + 1;
-          }
-        });
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setSelectedIndex((prevIndex) => {
-          if (prevIndex === 0) {
-            return items.length - 1;
-          } else {
-            return prevIndex - 1;
-          }
-        });
-        break;
-      default:
-        break;
+      // ... case blocks ...
     }
   };
 
   return (
     <div className="dropdown" onKeyDown={handleKeyDown}>
-      <Trigger
-        label={selectedItem ? selectedItem.text : "Select an item..."}
-        onClick={() => setIsOpen(!isOpen)}
-      />
-      {isOpen && (
-        <DropdownMenu
-          items={items}
-          onItemClick={setSelectedItem}
-          selectedIndex={selectedIndex}
-        />
-      )}
+      {/* ... rest of the JSX ... */}
     </div>
   );
 };
 ```
 
-Great, we have attached a `onKeyDown` event handler and it can detect the keypress when the element is focused (we have a `tabIndex` on the trigger element). Please note here we also passed `selectedIndex` to `DropdownMenu` item so when an item is selected we can decide to highlight it and set the aria attribute respectively:
+Additionally, we have updated our `DropdownMenu` component to accept a `selectedIndex` prop. This prop is used to apply a highlighted style and set the `aria-selected` attribute to the currently selected item, enhancing the visual feedback and accessibility.
 
 ```jsx
 const DropdownMenu = ({
@@ -656,77 +617,20 @@ const DropdownMenu = ({
 }) => {
   return (
     <div className="dropdown-menu" role="listbox">
-      {items.map((item, index) => (
-        <div
-          key={index}
-          role="option"
-          onClick={() => onItemClick(item)}
-          className={`item-container ${
-            index === selectedIndex ? "highlighted" : ""
-          }`}
-          aria-selected={index === selectedIndex}
-        >
-          <img src={item.icon} alt={item.text} />
-          <div className="details">
-            <div>{item.text}</div>
-            <small>{item.description}</small>
-          </div>
-        </div>
-      ))}
+      {/* ... rest of the JSX ... */}
     </div>
   );
 };
 ```
 
-*explain a bit about the code above.*
-
-For all the states and keyboard event handlers, they can be moved into a custom hook. We can call it `useDropdown` :
+Moving forward, we can encapsulate the state and keyboard event handling logic within a custom hook named `useDropdown`. This hook returns an object containing the necessary states and functions, which can be de-structured and used within our `Dropdown` component, keeping it clean and maintainable.
 
 ```jsx
-const getNextIndexOf = (total: number) => (current: number) => {
-  if (current === total - 1) {
-    return 0;
-  } else {
-    return current + 1;
-  }
-};
-
-const getPreviousIndexOf = (total: number) => (current: number) => {
-  if (current === 0) {
-    return total - 1;
-  } else {
-    return current - 1;
-  }
-};
-
 const useDropdown = (items: Item[]) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const getNextIndex = getNextIndexOf(items.length);
-  const getPreviousIndex = getPreviousIndexOf(items.length);
+  // ... state variables ...
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    switch (e.key) {
-      case "Enter":
-      case " ":
-        e.preventDefault();
-        setSelectedItem(items[selectedIndex]);
-        setIsOpen((isOpen) => !isOpen);
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        setSelectedIndex(getNextIndex);
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setSelectedIndex(getPreviousIndex);
-        break;
-      default:
-        break;
-    }
+    // ... switch statement ...
   };
   
   const toggleDropdown = () => setIsOpen((isOpen) => !isOpen);
@@ -742,9 +646,7 @@ const useDropdown = (items: Item[]) => {
 };
 ```
 
-*explain a bit on the code above*
-
-And the `Dropdown` component itself is simplified as the following.
+Now, our `Dropdown` component is simplified and more readable. It leverages the `useDropdown` hook to manage its state and handle keyboard interactions, demonstrating a clear separation of concerns and making the code easier to understand and manage.
 
 ```jsx
 const Dropdown = ({ items }: DropdownProps) => {
@@ -775,75 +677,52 @@ const Dropdown = ({ items }: DropdownProps) => {
 };
 ```
 
-*explain a bit on the code above*
+Through these modifications, we have successfully implemented keyboard navigation in our dropdown list, making it more accessible and user-friendly. This example also illustrates how hooks can be utilized to manage complex state and logic in a structured and modular manner, paving the way for further enhancements and feature additions to our UI components.
 
 We can visualise the code a bit better with the React Devtools:
 
 ![Devtools](images/dev-tools.png)
 
-And the benefit of extracting the whole logic into a hook - and allows it to maintain these states: which item is selected, what to highlight, should we show or hide the panel, etc. And it frees us from the logic (or state management) from the UI.
+The power of extracting our logic into a hook comes into full play when we need to implement a different UI while maintaining the same underlying functionality. By doing so, we've segregated our state management and interaction logic from the UI rendering, making it a breeze to change the UI without touching the logic.
 
-I’ll extend that point a bit here. Let’s say in other similiar scenario we need another Dropdown component which in UI is slightly different than this one. Maybe using a different CSS framework and make it more visual appealing.
+### Adapting to a New UI Requirement
 
-## What if I don’t like the UI?
+Consider a scenario where a new design requires using a button as a trigger and displaying avatars alongside the text in the dropdown list. With the logic already encapsulated in our `useDropdown` hook, adapting to this new UI is straightforward.
 
-We would like to use a button as a trigger, and showing some other elements in the dropdown list (showing the avatar inside a rounded square, for example).
-
-And obviously I don’t want to rewrite all the keyboard navigation and states management again for the new dropdown.
-
-![Tailwind List](images/list-tailwind.png)
-
-With a few HTML+CSS twist, we could easily get something like this:
+In the new `DropdownTailwind` component below, we've made use of Tailwind CSS to style our elements. The structure is slightly modified; a button is used as the trigger, and each item in the dropdown list now includes an image. Despite these UI changes, the core functionality remains intact, thanks to our `useDropdown` hook.
 
 ```tsx
 const DropdownTailwind = ({ items }: DropdownProps) => {
   const {
     isOpen,
-    toggleDropdown,
-    selectedIndex,
     selectedItem,
-    updateSelectedItem,
-    getAriaAttributes,
-    dropdownRef,
+    selectedIndex,
+    toggleDropdown,
+    handleKeyDown,
+    setSelectedItem,
   } = useDropdown<Item>(items);
 
   return (
     <div
       className="relative"
       onClick={toggleDropdown}
-      ref={dropdownRef as RefObject<HTMLDivElement>}
-      {...getAriaAttributes()}
+      onKeyDown={handleKeyDown}
     >
-      <button className="btn p-2 border rounded min-w-[240px]" tabIndex={0}>
+      <button className="btn p-2 border ..." tabIndex={0}>
         {selectedItem ? selectedItem.text : "Select an item..."}
       </button>
 
       {isOpen && (
         <ul
-          className="dropdown-menu bg-white shadow-sm rounded mt-2 absolute w-full min-w-[240px]"
+          className="dropdown-menu ..."
           role="listbox"
         >
           {(items).map((item, index) => (
             <li
               key={index}
               role="option"
-              aria-selected={index === selectedIndex}
-              onClick={() => updateSelectedItem(item)}
-              className={`p-2 border-b border-gray-200 flex items-center ${
-                index === selectedIndex ? "bg-gray-100" : ""
-              } hover:bg-blue-100`}
             >
-              <img
-                src={item.icon}
-                alt={item.text}
-                className="w-8 h-8 mr-2 rounded border-2 border-red-500"
-              />
-              <div className="flex flex-col">
-                <span className="text">{item.text}</span>
-                <span className="text-sm text-gray-500">
-                  {item.description}
-                </span>
-              </div>
+            {/* ... rest of the JSX ... */}
             </li>
           ))}
         </ul>
@@ -853,15 +732,23 @@ const DropdownTailwind = ({ items }: DropdownProps) => {
 };
 ```
 
-*explain a bit the code*
+In this rendition, the `DropdownTailwind` component interfaces with the `useDropdown` hook to manage its state and interactions. This design ensures that any UI modifications or enhancements do not necessitate a reimplementation of the underlying logic, significantly easing the adaptation to new design requirements. 
 
-## Exploring a few more states
+The image below illustrates how the new Tailwind styled dropdown looks, showcasing a different UI while retaining the core dropdown functionality and keyboard interactions.
+
+![Tailwind List](images/list-tailwind.png)
+
+Through this exercise, we've underscored the importance and efficiency of separating logic from the UI rendering, a practice that significantly boosts code reusability and maintainability, especially when dealing with UI components in a large-scale application.
+
+## Diving Deeper with Additional States
+
+As we advance with our dropdown component, let's explore more intricate states that come into play when dealing with remote data. The scenario of fetching data from a remote source brings forth the necessity to manage a few more states - specifically, we need to handle loading, error, and data states.
 
 ![Different status](images/status.png)
 
-## Instead of doing such change in-place
+### Unveiling Remote Data Fetching
 
-To load data from remote, there are many bioplate code need to write. We will need to define three new states: loading, error and the actual data we need.
+To load data from a remote server, we will need to define three new states: `loading`, `error`, and `data`. Here's how we can go about it:
 
 ```tsx
 //...
@@ -896,13 +783,9 @@ To load data from remote, there are many bioplate code need to write. We will ne
 //...
 ```
 
-*explain a bit code*
+### Refactoring for Elegance and Reusability
 
-Can we simplify the code a bit with what we just saw above - with hooks and higher-order function? Definitely
-
-## Network request related chanages
-
-We could extract the `fetchUsers` into a separate function:
+Incorporating fetching logic directly within our component can work, but it's not the most elegant or reusable approach. Let’s refactor this by extracting the fetching logic into a separate function:
 
 ```tsx
 const fetchUsers = async () => {
@@ -917,7 +800,7 @@ const fetchUsers = async () => {
 };
 ```
 
-We could then pass in this `fetchUsers` as a input into a hook, and inside the hook we call the function to fetch remote data:
+Now with the `fetchUsers` function in place, we can take a step further by abstracting our fetching logic into a generic hook. This hook will accept a fetch function and will manage the associated loading, error, and data states:
 
 ```tsx
 const useService = <T>(fetch: () => Promise<T>) => {
@@ -950,15 +833,19 @@ const useService = <T>(fetch: () => Promise<T>) => {
 }
 ```
 
-And this `useService` higher-order function hook can be shared in all types of data fetching in our application. 
+Now, the `useService` hook emerges as a reusable solution for data fetching across our application. It's a neat abstraction that we can employ to fetch various types of data, as demonstrated below:
 
 ```tsx
-cosnt { loading, error, data } = userService(fetchProducts);
+const { loading, error, data } = useService(fetchProducts);
 //or 
-cosnt { loading, error, data } = userService(fetchTickets);
+const { loading, error, data } = useService(fetchTickets);
 ```
 
-And in the `Dropdown`, our code almost remain the simplest form:
+With this refactoring, we've not only simplified our data fetching logic but also made it reusable across different scenarios in our application. This sets a solid foundation as we continue to enhance our dropdown component and delve deeper into more advanced features and optimizations.
+
+## Maintaining Simplicity in the `Dropdown` Component
+
+Incorporating remote data fetching has not complicated our `Dropdown` component, thanks to the abstracted logic in the `useService` and `useDropdown` hooks. Our component code remains in its simplest form, effectively managing the fetching states and rendering the content based on the data received.
 
 ```tsx
 const Dropdown = () => {
@@ -1005,11 +892,64 @@ const Dropdown = () => {
 };
 ```
 
-## Headless components
+In this updated `Dropdown` component, we utilize the `useService` hook to manage the data fetching states, and the `useDropdown` hook to manage the dropdown-specific states and interactions. The `renderContent` function elegantly handles the rendering logic based on the fetching states, ensuring that the correct content is displayed whether it's loading, an error, or the data. 
 
-This powerful pattern completely seprate our JSX code and the logic behind them, it's easy to compose the declaritve UI with JSX, but the difficult part is heavliy live inside the state management, and the headless component handles all these for us. And that could lead us to a new direction to abstract.
+Through the separation of concerns and the use of hooks, our `Dropdown` component remains clean and straightforward, showcasing the power of composable logic in React.
 
-There are many libraries already available out there, I just list a few here as a reference. Again, the example above should only be learning purpose and don't try it in your production environment. To make customisable component fully aira compatiable, you need to spend trenmodens work behind the sence - so try to use some production proven libraries instead.
+## Headless Components: Bridging Logic and Presentation
 
+The headless component pattern unveils a robust avenue for cleanly segregating our JSX code from the underlying logic. While composing declarative UI with JSX comes naturally, the real challenge burgeons in managing state. This is where headless components come into play by shouldering all the state management intricacies, propelling us towards a new horizon of abstraction.
+
+In essence, a headless component is a function or object that encapsulates logic, but doesn’t render anything itself. It leaves the rendering part to the consumer, thus offering a high degree of flexibility in how the UI is rendered. This pattern can be exceedingly useful when we have complex logic that we want to reuse across different visual representations.
+
+```jsx
+function useDropdownLogic() {
+  // ... all the dropdown logic
+  return {
+    // ... exposed logic
+  };
+}
+
+function MyDropdown() {
+  const dropdownLogic = useDropdownLogic();
+  return (
+    // ... render the UI using the logic from dropdownLogic
+  );
+}
+```
+
+### Advantages of headless component:
+
+1. **Reusability**: The logic encapsulated in headless components can be reused across multiple components. This fosters DRY (Don’t Repeat Yourself) principles in your codebase.
+2. **Separation of Concerns**: By decoupling logic from rendering, headless components promote a clear separation of concerns which is a cornerstone of maintainable code.
+3. **Flexibility**: They allow for varying UI implementations while sharing the same core logic, making it easier to adapt to different design requirements or frameworks.
+
+### Drawbacks of headless component:
+
+1. **Learning Curve**: The pattern may introduce a learning curve for developers unfamiliar with it, potentially slowing down development initially.
+2. **Over-abstraction**: If not managed judiciously, the abstraction created by headless components can lead to a level of indirection that might make the code harder to follow.
+
+### Libraries and Further Exploration:
+
+The headless component pattern has been embraced by various libraries to facilitate the creation of accessible, customizable, and reusable components. Here are some notable libraries along with a brief description of each:
+
+- **[React ARIA](https://react-spectrum.adobe.com/react-aria/)**: A library from Adobe that provides accessibility primitives and hooks for building inclusive React applications. It offers a collection of hooks to manage keyboard interactions, focus management, and ARIA annotations, making it easier to create accessible UI components.
+
+- **[Headless UI](https://headlessui.dev/)**: A completely unstyled, fully accessible UI component library, designed to integrate beautifully with Tailwind CSS. It provides the behavior and accessibility foundation upon which you can build your own styled components.
+
+- **[React Table](https://react-table.tanstack.com/)**: A headless utility for building fast and extendable tables and datagrids for React. It provides a flexible hook that allows you to create complex tables with ease, leaving the UI representation up to you.
+
+- **[Downshift](https://www.downshift-js.com/)**: A minimalist library to help you create accessible and customizable dropdowns, comboboxes, and more. It handles all the logic while letting you define the rendering aspect.
+
+
+These libraries embody the essence of the headless component pattern by encapsulating complex logic and behaviors, making it straightforward to create highly interactive and accessible UI components. While the provided example serves as a learning stepping stone, it's prudent to leverage these production-ready libraries for building robust, accessible, and customizable components in a real-world scenario.
+
+This pattern not only educates us on managing complex logic and state but also nudges us to explore production-ready libraries that have honed the headless component approach to deliver robust, accessible, and customizable components for real-world use.
 
 ## Summary
+
+In this article, we delved into the world of Higher-Order Components (HOCs) and Hooks in React, exploring their utility in enhancing component logic while maintaining a clean, readable codebase. Through the lens of creating an expandable panel and a dropdown list, we illustrated the composability of HOCs and the encapsulation of stateful logic that Hooks offer. Transitioning to a more intricate dropdown list, we introduced asynchronous data fetching, demonstrating how Hooks can simplify state management in data loading scenarios.
+
+We then transitioned into the realm of headless components, a powerful pattern that separates logic from the JSX code, providing a robust framework for managing state while leaving the UI representation to the developer. Through examples, we demonstrated how this separation facilitates the creation of reusable, accessible, and customizable components. The discussion was enriched with a review of notable libraries like React Table, Downshift, React UseGesture, React ARIA, and Headless UI that embody the headless component pattern, providing ready-to-use solutions for building interactive and accessible UI components.
+
+This exploration underscores the importance of understanding and leveraging these patterns and libraries to build scalable, accessible, and maintainable React applications.
