@@ -12,7 +12,7 @@ This article aims to delve into the fundamental problems and explore the various
 
 With that in mind, let's take a step back, maybe grab a coffee, and start with a basic yet powerful concept—higher-order functions (HOFs), setting the stage for our explorative journey into state management in React. 
 
-## Higher-order Function
+## Starting with Higher-order Function
 
 A higher-order function (HOF) is a concept borrowed from functional programming. It refers to a function that either accepts another function as an argument, returns a function, or both. This idea might initially seem perplexing, especially if you're coming from a traditional object-oriented programming background where this concept isn't as prevalent.
 
@@ -24,7 +24,7 @@ const printLineItem = (item) => {
 };
 ```
 
-Suppose you have an array of items:
+Suppose you have an array of items, and we can call `printLineItem` to print out the formatted details:
 
 ```ts
 const items = [
@@ -33,8 +33,6 @@ const items = [
 ];
 
 console.log(printLineItem(items[0]));
-
-// Output: Name: Apple - Price: $1
 ```
 
 Now, let's say you want to add a header to this output, to better structure the information. You could achieve this by creating a higher-order function named `withHeader`. This function accepts another function (`contentFunc`) as an argument and returns a new function:
@@ -53,33 +51,16 @@ Now you can pass `printLineItem` to `withHeader`, which in turn, returns a new f
 ```ts
 const report = withHeader(printLineItem);
 console.log(report(items[0]));
+```
 
-// Output:
-// === Header ===
-// Name: Apple - Price: $1
+It will output something like this:
+
+```text
+=== Header ===
+Name: Apple - Price: $1
 ```
 
 In this example, `withHeader` is a higher-order function that wraps around `printLineItem` to enhance its functionality, demonstrating a simple yet effective way to compose functions and extend their behavior.
-
-Expanding on our initial example, let's introduce a bit more complexity to showcase the power and flexibility of higher-order functions.
-
-```ts
-const printLineItem = (item) => {
-  return `Name: ${item.name} - Price: $${item.price}`;
-};
-
-const withHeader = (contentFunc) => {
-  return (...args) => {
-    const header = "=== Header ===\n";
-    return header + contentFunc(...args);
-  };
-};
-
-const items = [
-  { name: 'Apple', price: 1 },
-  { name: 'Banana', price: 0.75 },
-];
-```
 
 Now, just as we created a `withHeader` function to add a header, let's create a `withFooter` function to append a footer to our output:
 
@@ -97,11 +78,14 @@ We can now wrap `printLineItem` with both `withHeader` and `withFooter` to gener
 ```ts
 const report = withFooter(withHeader(printLineItem));
 console.log(report(items[0]));
+```
 
-// Output:
-// === Header ===
-// Name: Apple - Price: $1
-// === Footer ===
+The above code would print out something more informative:
+
+```text
+=== Header ===
+Name: Apple - Price: $1
+=== Footer ===
 ```
 
 This composition enhances `printLineItem` without modifying its original implementation, showcasing the beauty of function composition. Furthermore, `withHeader` and `withFooter` remain agnostic to the nature of the wrapped function, a powerful feature of higher-order functions.
@@ -113,21 +97,17 @@ const printAllItems = (items) => items.map(printLineItem).join('\n');
 
 const report = withFooter(withHeader(printAllItems));
 console.log(report(items));
-
-// Output:
-// === Header ===
-// Name: Apple - Price: $1
-// Name: Banana - Price: $0.75
-// === Footer ===
 ```
 
 By doing so, we've now created a report for multiple items without altering the implementations of `withHeader` or `withFooter`. This example exemplifies the loose coupling and composability inherent in higher-order functions. 
+
+Observe that the higher-order functions withHeader and withFooter accept a function as input. The function they return maintains the same signature as the input function and can be utilized in the same manner as invoking the original function. This exemplifies a potent pattern that can be harnessed in various scenarios.
 
 As we reflect on this, an intriguing question arises: Can we transfer this level of composability and functional elegance into our React applications? 
 
 Indeed, the ability to enhance components is not exclusive to functions; we can achieve the same with React components, thanks to Higher-Order Components (HOCs). A Higher-Order Component is a function that takes a component as an argument and returns a new, enhanced component.
 
-## Higher-order Components
+## Introducing Higher-order Components
 
 The principle behind Higher-order Components (HOCs) is straightforward: they allow you to inject additional functionality into an existing component. This pattern is especially beneficial when you want to reuse certain behaviors across multiple components.
 
@@ -158,7 +138,7 @@ Now, whenever `Profile` is rendered, it will first check if the user is authoriz
 
 Now that we've seen how higher-order components can control access with `withAuthorization`, let's shift our focus to enhancing user interactions. We'll delve into an `ExpandablePanel` component, showcasing how higher-order components can also manage interactive UI elements and state transitions.
 
-### ExpandablePanel component
+### Implementing an ExpandablePanel Component
 
 Let's kick things off with a basic ExpandablePanel component. This component, as the name suggests, consists of a title and a content area. Initially, the content area is collapsed, but with a click on the title, it expands to reveal the content.
 
@@ -331,9 +311,9 @@ In the expression `withAutoClose(withKeyboardToggle(ExpandablePanel), 2000);`, `
 
 If you have some background in object-oriented programming, this concept might resonate with you as it aligns with the decorator design pattern. Assuming you may not be familiar, I'll provide a simple refresher on this pattern since it's fundamental and we'll likely encounter it again.
 
----
+--- *This can be used as a side note if too distracting* 
 
-## Decorator Pattern
+## A Refresher on the Decorator Pattern
 
 At its core, the Decorator Pattern allows us to extend or alter the functionality of objects at run-time by wrapping them in a layer of a decorative class. This pattern is quite handy when you wish to adhere to the Open/Closed Principle, making your code open for extension but closed for modification.
 
@@ -352,6 +332,7 @@ Thus, regardless of how you choose to decorate your coffee, to the consumer, it 
 Higher-Order Components (HOCs) are a powerful pattern for creating composable and reusable logic in your components. However, they come with their own set of advantages and drawbacks. Let's take a look:
 
 ### Pros of Higher-Order Components:
+
 1. **Reusability:** HOCs enable you to extract and reuse common logic across multiple components, promoting DRY (Don't Repeat Yourself) principles.
 2. **Composition:** They thrive in a system that favors composition, allowing developers to create enhanced components by composing multiple HOCs together.
 3. **Separation of Concerns:** By isolating certain behaviors or logic into HOCs, they help in maintaining a clean separation of concerns.
@@ -364,7 +345,7 @@ Higher-Order Components (HOCs) are a powerful pattern for creating composable an
 
 Transitioning from Higher-Order Components, we now venture into Hooks — a newer and potent feature in React for handling state and effects in functional components. Up next, we'll unravel how Hooks provide a more straightforward approach to managing state and logic in your components.
 
-## React Hooks
+## Exploring React Hooks
 
 > ...With Hooks, you can extract stateful logic from a component so it can be tested independently and reused. Hooks allow you to reuse stateful logic without changing your component hierarchy...
 
@@ -577,8 +558,6 @@ In this updated code structure, we've separated concerns by creating specialized
 
 ![List native implementation](images/list-native.png)
 
----
-
 ## Implementing Keyboard Navigation
 
 Incorporating keyboard navigation within our dropdown list enhances the user experience by providing an alternative to mouse interactions. This is particularly important for accessibility and offers a seamless navigation experience on the web page. Let's explore how we can achieve this using the `onKeyDown` event handler.
@@ -685,7 +664,7 @@ We can visualise the code a bit better with the React Devtools:
 
 The power of extracting our logic into a hook comes into full play when we need to implement a different UI while maintaining the same underlying functionality. By doing so, we've segregated our state management and interaction logic from the UI rendering, making it a breeze to change the UI without touching the logic.
 
-### Adapting to a New UI Requirement
+## Adapting to a New UI Requirement
 
 Consider a scenario where a new design requires using a button as a trigger and displaying avatars alongside the text in the dropdown list. With the logic already encapsulated in our `useDropdown` hook, adapting to this new UI is straightforward.
 
@@ -762,7 +741,7 @@ To load data from a remote server, we will need to define three new states: `loa
         const response = await fetch("/api/users");
 
         if (!response.ok) {
-          const error = await response.json(); // assume the response body has error info
+          const error = await response.json();
           throw new Error(`Error: ${error.error || response.status}`);
         }
 
@@ -841,7 +820,7 @@ const { loading, error, data } = useService(fetchTickets);
 
 With this refactoring, we've not only simplified our data fetching logic but also made it reusable across different scenarios in our application. This sets a solid foundation as we continue to enhance our dropdown component and delve deeper into more advanced features and optimizations.
 
-## Maintaining Simplicity in the `Dropdown` Component
+## Maintaining Simplicity in the Dropdown Component
 
 Incorporating remote data fetching has not complicated our `Dropdown` component, thanks to the abstracted logic in the `useService` and `useDropdown` hooks. Our component code remains in its simplest form, effectively managing the fetching states and rendering the content based on the data received.
 
@@ -894,7 +873,7 @@ In this updated `Dropdown` component, we utilize the `useService` hook to manage
 
 Through the separation of concerns and the use of hooks, our `Dropdown` component remains clean and straightforward, showcasing the power of composable logic in React.
 
-## Headless Components: Bridging Logic and Presentation
+## Introducing Headless Component Pattern
 
 The headless component pattern unveils a robust avenue for cleanly segregating our JSX code from the underlying logic. While composing declarative UI with JSX comes naturally, the real challenge burgeons in managing state. This is where headless components come into play by shouldering all the state management intricacies, propelling us towards a new horizon of abstraction.
 
@@ -915,6 +894,10 @@ function MyDropdown() {
   );
 }
 ```
+
+When visualized, the headless component appears as a slender layer interfacing with JSX views on one side, and communicating with underlying data models on the other (for a deeper dive about domain modelling, refer to [article](https://martinfowler.com/articles/modularizing-react-apps.html)). This pattern is particularly beneficial for individuals seeking solely the behavior or state management aspect of the UI, as it conveniently segregates these from the visual representation.
+
+![The headless component pattern](images/headless-component.png)
 
 ### Advantages of headless component:
 
