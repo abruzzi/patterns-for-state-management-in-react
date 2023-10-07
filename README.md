@@ -1,4 +1,4 @@
-# patterns-for-state-management-in-react
+# Strategic UI Composition: Harnessing HOCs, Hooks, and Headless Components
 
 Managing state in UI applications is a challenging endeavor. A part of this challenge stems from the many states one needs to manage. There are local states like `isOpen` or `selectedIndex`, states representing remote data like `loading`, `error`, `data`, and environmental states such as router paths, `isUserAuthorized`, and configurations like feature flags to determine the availability of certain features to the user.
 
