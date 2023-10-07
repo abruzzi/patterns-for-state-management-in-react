@@ -450,7 +450,7 @@ We'll start with a basic version of a dropdown list, then gradually introduce mo
 
 A dropdown list is a common component used in many places. Although there's a native select component for basic use cases, a more advanced version offering more control over each option provides a better user experience.
 
-![Dropdown list component](images/illustration.png)
+![Dropdown list component](images/dropdown-list.png)
 
 Creating one from scratch, a complete implementation, requires more effort than it appears at first glance. It's essential to consider keyboard navigation, accessibility (for instance, screen reader compatibility), and usability on mobile devices, among others.
 
@@ -736,15 +736,13 @@ In this rendition, the `DropdownTailwind` component interfaces with the `useDrop
 
 The image below illustrates how the new Tailwind styled dropdown looks, showcasing a different UI while retaining the core dropdown functionality and keyboard interactions.
 
-![Tailwind List](images/list-tailwind.png)
-
 Through this exercise, we've underscored the importance and efficiency of separating logic from the UI rendering, a practice that significantly boosts code reusability and maintainability, especially when dealing with UI components in a large-scale application.
 
 ## Diving Deeper with Additional States
 
 As we advance with our dropdown component, let's explore more intricate states that come into play when dealing with remote data. The scenario of fetching data from a remote source brings forth the necessity to manage a few more states - specifically, we need to handle loading, error, and data states.
 
-![Different status](images/status.png)
+![Different status](images/dropdown-async-status.png)
 
 ### Unveiling Remote Data Fetching
 
