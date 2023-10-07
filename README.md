@@ -658,7 +658,7 @@ const Dropdown = ({ items }: DropdownProps) => {
 
 Through these modifications, we have successfully implemented keyboard navigation in our dropdown list, making it more accessible and user-friendly. This example also illustrates how hooks can be utilized to manage complex state and logic in a structured and modular manner, paving the way for further enhancements and feature additions to our UI components.
 
-We can visualise the code a bit better with the React Devtools:
+We can visualise the code a bit better with the React Devtools, note in the *hooks* section, all the states are listed in it:
 
 ![Devtools](images/dev-tools.png)
 
