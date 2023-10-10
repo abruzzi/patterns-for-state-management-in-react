@@ -713,8 +713,6 @@ const DropdownTailwind = ({ items }: DropdownProps) => {
 
 In this rendition, the `DropdownTailwind` component interfaces with the `useDropdown` hook to manage its state and interactions. This design ensures that any UI modifications or enhancements do not necessitate a reimplementation of the underlying logic, significantly easing the adaptation to new design requirements. 
 
-The image below illustrates how the new Tailwind styled dropdown looks, showcasing a different UI while retaining the core dropdown functionality and keyboard interactions.
-
 Through this exercise, we've underscored the importance and efficiency of separating logic from the UI rendering, a practice that significantly boosts code reusability and maintainability, especially when dealing with UI components in a large-scale application.
 
 ## Diving Deeper with Additional States
