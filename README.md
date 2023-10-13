@@ -20,7 +20,7 @@ Each of these considerations adds layers of complexity to our dropdown component
 
 Facing these challenges head-on, the Headless Component pattern offers a way out. It emphasizes the separation of the calculation from the UI representation, giving developers the power to build versatile, maintainable, and reusable components.
 
-A headless component, often referred to as a "renderless" component, is a design pattern in React where a component - normally inplemented as React hooks - is responsible solely for logic and state management without prescribing any specific UI (User Interface). It provides the "brains" of the operation but leaves the "looks" to the developer implementing it. In essence, it offers functionality without forcing a particular visual representation.
+A headless component is a design pattern in React where a component - normally inplemented as React hooks - is responsible solely for logic and state management without prescribing any specific UI (User Interface). It provides the "brains" of the operation but leaves the "looks" to the developer implementing it. In essence, it offers functionality without forcing a particular visual representation.
 
 When visualized, the headless component appears as a slender layer interfacing with JSX views on one side, and communicating with underlying data models on the other when required. This pattern is particularly beneficial for individuals seeking solely the behavior or state management aspect of the UI, as it conveniently segregates these from the visual representation.
 
