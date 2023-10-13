@@ -177,28 +177,7 @@ const Dropdown = ({ items }: DropdownProps) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     switch (e.key) {
       // ... case blocks ...
-    }
-  };
-
-  const handleKeyDown = (e: KeyboardEvent) => {
-    switch (e.key) {
-      case "Enter":
-      case " ":
-        e.preventDefault();
-        setSelectedItem(items[selectedIndex]);
-        setIsOpen((isOpen) => !isOpen);
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        setSelectedIndex(getNextIndex);
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setSelectedIndex(getPreviousIndex);
-        break;
-      // ... a few more key handler
-      default:
-        break;
+      // ... handling Enter, Space, ArrowDown and ArrowUp ...
     }
   };
 
