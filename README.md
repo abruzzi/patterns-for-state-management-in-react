@@ -643,11 +643,11 @@ function MyDropdown() {
 
 Headless components offer several benefits, including enhanced reusability as they encapsulate logic that can be shared across multiple components, adhering to the DRY (Don’t Repeat Yourself) principle. They emphasize a clear separation of concerns by distinctly differentiating logic from rendering, a foundational practice for crafting maintainable code. Additionally, they provide flexibility by allowing developers to adopt varied UI implementations using the same core logic, which is particularly advantageous when dealing with different design requirements or working with various frameworks. 
 
+However, it's essential to approach them with discernment. Like any design pattern, they come with challenges. For those unfamiliar, there might be an initial learning curve that could temporarily slow down development. Moreover, if not applied judiciously, the abstraction introduced by headless components might add a level of indirection, potentially complicating the code's readability.
+
 I'd like to note that this pattern could be applicable in other frontend libraries or frameworks. For instance, Vue refers to this concept as a `renderless` component. It embodies the same principle, prompting developers to segregate logic and state management into a distinct component, thereby enabling users to construct the UI around it. 
 
 I'm uncertain about its implementation or compatibility in Angular or other frameworks, but I recommend considering its potential benefits in your specific context.
-
-However, it's essential to approach them with discernment. Like any design pattern, they come with challenges. For those unfamiliar, there might be an initial learning curve that could temporarily slow down development. Moreover, if not applied judiciously, the abstraction introduced by headless components might add a level of indirection, potentially complicating the code's readability.
 
 ## Understanding the community
 
