@@ -20,11 +20,11 @@ Each of these considerations adds layers of complexity to our dropdown component
 
 Facing these challenges head-on, the Headless Component pattern offers a way out. It emphasizes the separation of the calculation from the UI representation, giving developers the power to build versatile, maintainable, and reusable components.
 
-A headless component is a design pattern in React where a component - normally inplemented as React hooks - is responsible solely for logic and state management without prescribing any specific UI (User Interface). It provides the "brains" of the operation but leaves the "looks" to the developer implementing it. In essence, it offers functionality without forcing a particular visual representation.
+A Headless Component is a design pattern in React where a component - normally inplemented as React hooks - is responsible solely for logic and state management without prescribing any specific UI (User Interface). It provides the "brains" of the operation but leaves the "looks" to the developer implementing it. In essence, it offers functionality without forcing a particular visual representation.
 
-When visualized, the headless component appears as a slender layer interfacing with JSX views on one side, and communicating with underlying data models on the other when required. This pattern is particularly beneficial for individuals seeking solely the behavior or state management aspect of the UI, as it conveniently segregates these from the visual representation.
+When visualized, the Headless Component appears as a slender layer interfacing with JSX views on one side, and communicating with underlying data models on the other when required. This pattern is particularly beneficial for individuals seeking solely the behavior or state management aspect of the UI, as it conveniently segregates these from the visual representation.
 
-![The headless component pattern](images/headless-component.png)
+![The Headless Component pattern](images/headless-component.png)
 
 For instance, consider a headless dropdown component. It would handle state management for open/close states, item selection, keyboard navigation, etc. When it's time to render, instead of rendering its own hardcoded dropdown UI, it provides this state and logic to a child function or component, letting the developer decide how it should visually appear.
 
@@ -217,9 +217,9 @@ const DropdownMenu = ({
 };
 ```
 
-To address this, we'll introduce the concept of a headless component via a custom hook named `useDropdown`. This hook efficiently wraps up the state and keyboard event handling logic, returning an object filled with essential states and functions. By de-structuring this in our `Dropdown` component, we keep our code neat and sustainable. 
+To address this, we'll introduce the concept of a Headless Component via a custom hook named `useDropdown`. This hook efficiently wraps up the state and keyboard event handling logic, returning an object filled with essential states and functions. By de-structuring this in our `Dropdown` component, we keep our code neat and sustainable. 
 
-The magic lies in the `useDropdown` hook, our protagonist—the headless component. This versatile unit houses everything a dropdown needs: whether it's open, the selected item, the highlighted item, reactions to the Enter key, and so forth. The beauty is its adaptability; you can pair it with various visual presentations—your JSX elements.
+The magic lies in the `useDropdown` hook, our protagonist—the Headless Component. This versatile unit houses everything a dropdown needs: whether it's open, the selected item, the highlighted item, reactions to the Enter key, and so forth. The beauty is its adaptability; you can pair it with various visual presentations—your JSX elements.
 
 ```jsx
 const useDropdown = (items: Item[]) => {
@@ -282,7 +282,7 @@ const Dropdown = ({ items }: DropdownProps) => {
 
 Through these modifications, we have successfully implemented keyboard navigation in our dropdown list, making it more accessible and user-friendly. This example also illustrates how hooks can be utilized to manage complex state and logic in a structured and modular manner, paving the way for further enhancements and feature additions to our UI components.
 
-The beauty of this design lies in its distinct separation of logic from presentation. By 'logic', we refer to the core functionalities of a `select` component: the open/close state, the selected item, the highlighted element, and the reactions to user inputs like pressing the ArrowDown when choosing from the list. This division ensures that our component retains its core behavior without being bound to a specific visual representation, justifying the term "headless component".
+The beauty of this design lies in its distinct separation of logic from presentation. By 'logic', we refer to the core functionalities of a `select` component: the open/close state, the selected item, the highlighted element, and the reactions to user inputs like pressing the ArrowDown when choosing from the list. This division ensures that our component retains its core behavior without being bound to a specific visual representation, justifying the term "Headless Component".
 ## Testing the Headless Component
 
 The logic of our component is centralized, enabling its reuse in diverse scenarios. It's crucial for this functionality to be reliable. Thus, comprehensive testing becomes imperative. The good news is, testing such behavior is straightforward.
@@ -311,7 +311,7 @@ it("should handle dropdown open/close state", () => {
 });
 ```
 
-Keyboard navigation tests are slightly more intricate, primarily due to the absence of a visual interface. This necessitates a more integrated testing approach. One effective method is crafting a mock test component to authenticate the behavior. Such tests serve a dual purpose: they provide an instructional guide on utilizing the headless component and, since they employ JSX, offer a genuine insight into user interactions.
+Keyboard navigation tests are slightly more intricate, primarily due to the absence of a visual interface. This necessitates a more integrated testing approach. One effective method is crafting a mock test component to authenticate the behavior. Such tests serve a dual purpose: they provide an instructional guide on utilizing the Headless Component and, since they employ JSX, offer a genuine insight into user interactions.
 
 Consider the following test, which replaces the prior state check with an integration test:
 
@@ -334,7 +334,7 @@ it("trigger to toggle", async () => {
 });
 ```
 
-The `SimpleDropdown` below is a mock component, designed exclusively for testing. It also doubles as a hands-on example for users aiming to implement the headless component.
+The `SimpleDropdown` below is a mock component, designed exclusively for testing. It also doubles as a hands-on example for users aiming to implement the Headless Component.
 
 ```tsx
 const SimpleDropdown = () => {
@@ -458,7 +458,7 @@ We can also visualise the code a bit better with the React Devtools, note in the
 
 ![Devtools](images/dev-tools.png)
 
-Every dropdown list, regardless of its external appearance, shares consistent behavior internally, all of which is encapsulated within the `useDropdown` hook (the headless component). However, what if we need to manage more states, like, async states when we have to fetch data from remote.
+Every dropdown list, regardless of its external appearance, shares consistent behavior internally, all of which is encapsulated within the `useDropdown` hook (the Headless Component). However, what if we need to manage more states, like, async states when we have to fetch data from remote.
 
 ## Diving Deeper with Additional States
 
@@ -507,7 +507,7 @@ The code initializes three state variables: `loading`, `data`, and `error`. When
 
 ### Refactoring for Elegance and Reusability
 
-Incorporating fetching logic directly within our component can work, but it's not the most elegant or reusable approach. We can push the principle behind headless component a bit further here, separate the logic and state out of the UI. Let’s refactor this by extracting the fetching logic into a separate function:
+Incorporating fetching logic directly within our component can work, but it's not the most elegant or reusable approach. We can push the principle behind Headless Component a bit further here, separate the logic and state out of the UI. Let’s refactor this by extracting the fetching logic into a separate function:
 
 ```tsx
 const fetchUsers = async () => {
@@ -617,13 +617,13 @@ const Dropdown = () => {
 
 In this updated `Dropdown` component, we utilize the `useService` hook to manage the data fetching states, and the `useDropdown` hook to manage the dropdown-specific states and interactions. The `renderContent` function elegantly handles the rendering logic based on the fetching states, ensuring that the correct content is displayed whether it's loading, an error, or the data. 
 
-In the above example, observe how the headless component promotes loose coupling among parts. This flexibility lets us interchange parts for varied combinations. With shared `Loading` and `Error` components, we can effortlessly craft a `UserDropdown` with default JSX and styling, or a `ProductDropdown` using TailwindCSS that fetches data from a different API endpoint.
+In the above example, observe how the Headless Component promotes loose coupling among parts. This flexibility lets us interchange parts for varied combinations. With shared `Loading` and `Error` components, we can effortlessly craft a `UserDropdown` with default JSX and styling, or a `ProductDropdown` using TailwindCSS that fetches data from a different API endpoint.
 
 ## Concluding the Headless Component Pattern
 
-The headless component pattern unveils a robust avenue for cleanly segregating our JSX code from the underlying logic. While composing declarative UI with JSX comes naturally, the real challenge burgeons in managing state. This is where headless components come into play by shouldering all the state management intricacies, propelling us towards a new horizon of abstraction.
+The Headless Component pattern unveils a robust avenue for cleanly segregating our JSX code from the underlying logic. While composing declarative UI with JSX comes naturally, the real challenge burgeons in managing state. This is where Headless Components come into play by shouldering all the state management intricacies, propelling us towards a new horizon of abstraction.
 
-In essence, a headless component is a function or object that encapsulates logic, but doesn’t render anything itself. It leaves the rendering part to the consumer, thus offering a high degree of flexibility in how the UI is rendered. This pattern can be exceedingly useful when we have complex logic that we want to reuse across different visual representations.
+In essence, a Headless Component is a function or object that encapsulates logic, but doesn’t render anything itself. It leaves the rendering part to the consumer, thus offering a high degree of flexibility in how the UI is rendered. This pattern can be exceedingly useful when we have complex logic that we want to reuse across different visual representations.
 
 ```jsx
 function useDropdownLogic() {
@@ -641,9 +641,9 @@ function MyDropdown() {
 }
 ```
 
-Headless components offer several benefits, including enhanced reusability as they encapsulate logic that can be shared across multiple components, adhering to the DRY (Don’t Repeat Yourself) principle. They emphasize a clear separation of concerns by distinctly differentiating logic from rendering, a foundational practice for crafting maintainable code. Additionally, they provide flexibility by allowing developers to adopt varied UI implementations using the same core logic, which is particularly advantageous when dealing with different design requirements or working with various frameworks. 
+Headless Components offer several benefits, including enhanced reusability as they encapsulate logic that can be shared across multiple components, adhering to the DRY (Don’t Repeat Yourself) principle. They emphasize a clear separation of concerns by distinctly differentiating logic from rendering, a foundational practice for crafting maintainable code. Additionally, they provide flexibility by allowing developers to adopt varied UI implementations using the same core logic, which is particularly advantageous when dealing with different design requirements or working with various frameworks. 
 
-However, it's essential to approach them with discernment. Like any design pattern, they come with challenges. For those unfamiliar, there might be an initial learning curve that could temporarily slow down development. Moreover, if not applied judiciously, the abstraction introduced by headless components might add a level of indirection, potentially complicating the code's readability.
+However, it's essential to approach them with discernment. Like any design pattern, they come with challenges. For those unfamiliar, there might be an initial learning curve that could temporarily slow down development. Moreover, if not applied judiciously, the abstraction introduced by Headless Components might add a level of indirection, potentially complicating the code's readability.
 
 I'd like to note that this pattern could be applicable in other frontend libraries or frameworks. For instance, Vue refers to this concept as a `renderless` component. It embodies the same principle, prompting developers to segregate logic and state management into a distinct component, thereby enabling users to construct the UI around it. 
 
@@ -651,7 +651,7 @@ I'm uncertain about its implementation or compatibility in Angular or other fram
 
 ## Understanding the community
 
-The concept of headless components isn't novel, it has existed for some time but hasn't been widely acknowledged or incorporated into projects. However, several libraries have adopted the headless component pattern, promoting the development of accessible, adaptable, and reusable components. Some of these libraries have already gained significant traction within the community:
+The concept of Headless Components isn't novel, it has existed for some time but hasn't been widely acknowledged or incorporated into projects. However, several libraries have adopted the Headless Component pattern, promoting the development of accessible, adaptable, and reusable components. Some of these libraries have already gained significant traction within the community:
 
 - **[React ARIA](https://react-spectrum.adobe.com/react-aria/)**: A library from Adobe that provides accessibility primitives and hooks for building inclusive React applications. It offers a collection of hooks to manage keyboard interactions, focus management, and ARIA annotations, making it easier to create accessible UI components.
 
@@ -661,14 +661,14 @@ The concept of headless components isn't novel, it has existed for some time but
 
 - **[Downshift](https://www.downshift-js.com/)**: A minimalist library to help you create accessible and customizable dropdowns, comboboxes, and more. It handles all the logic while letting you define the rendering aspect.
 
-These libraries embody the essence of the headless component pattern by encapsulating complex logic and behaviors, making it straightforward to create highly interactive and accessible UI components. While the provided example serves as a learning stepping stone, it's prudent to leverage these production-ready libraries for building robust, accessible, and customizable components in a real-world scenario.
+These libraries embody the essence of the Headless Component pattern by encapsulating complex logic and behaviors, making it straightforward to create highly interactive and accessible UI components. While the provided example serves as a learning stepping stone, it's prudent to leverage these production-ready libraries for building robust, accessible, and customizable components in a real-world scenario.
 
-This pattern not only educates us on managing complex logic and state but also nudges us to explore production-ready libraries that have honed the headless component approach to deliver robust, accessible, and customizable components for real-world use.
+This pattern not only educates us on managing complex logic and state but also nudges us to explore production-ready libraries that have honed the Headless Component approach to deliver robust, accessible, and customizable components for real-world use.
 
 ## Summary
 
-In this article, we delve into the concept of headless components, a sometimes overlooked pattern in crafting reusable UI logic. Using the creation of an intricate dropdown list as an example, we begin with a simple dropdown and incrementally introduce features such as keyboard navigation and asynchronous data fetching. This approach showcases the seamless extraction of reusable logic into a headless component and highlights the ease with which we can overlay a new UI.
+In this article, we delve into the concept of Headless Components, a sometimes overlooked pattern in crafting reusable UI logic. Using the creation of an intricate dropdown list as an example, we begin with a simple dropdown and incrementally introduce features such as keyboard navigation and asynchronous data fetching. This approach showcases the seamless extraction of reusable logic into a Headless Component and highlights the ease with which we can overlay a new UI.
 
-Through practical examples, we illuminate how such separation paves the way for building reusable, accessible, and tailored components. We also spotlight renowned libraries like React Table, Downshift, React UseGesture, React ARIA, and Headless UI that champion the headless component pattern. These libraries offer pre-configured solutions for developing interactive and user-friendly UI components.
+Through practical examples, we illuminate how such separation paves the way for building reusable, accessible, and tailored components. We also spotlight renowned libraries like React Table, Downshift, React UseGesture, React ARIA, and Headless UI that champion the Headless Component pattern. These libraries offer pre-configured solutions for developing interactive and user-friendly UI components.
 
 This deep dive emphasizes the pivotal role of the separation of concerns in the UI development process, underscoring its significance in crafting scalable, accessible, and maintainable React applications.
