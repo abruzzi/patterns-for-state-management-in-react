@@ -216,6 +216,9 @@ const DropdownMenu = ({
   );
 };
 ```
+Now, our `Dropdown` component is entangled with both state management code and rendering logic. It houses an extensive switch case along with all the state management constructs such as `selectedItem`, `selectedIndex`, `setSelectedItem`, and so forth.
+
+## Implementing Headless Component with a Custom Hook
 
 To address this, we'll introduce the concept of a Headless Component via a custom hook named `useDropdown`. This hook efficiently wraps up the state and keyboard event handling logic, returning an object filled with essential states and functions. By de-structuring this in our `Dropdown` component, we keep our code neat and sustainable. 
 
@@ -283,6 +286,7 @@ const Dropdown = ({ items }: DropdownProps) => {
 Through these modifications, we have successfully implemented keyboard navigation in our dropdown list, making it more accessible and user-friendly. This example also illustrates how hooks can be utilized to manage complex state and logic in a structured and modular manner, paving the way for further enhancements and feature additions to our UI components.
 
 The beauty of this design lies in its distinct separation of logic from presentation. By 'logic', we refer to the core functionalities of a `select` component: the open/close state, the selected item, the highlighted element, and the reactions to user inputs like pressing the ArrowDown when choosing from the list. This division ensures that our component retains its core behavior without being bound to a specific visual representation, justifying the term "Headless Component".
+
 ## Testing the Headless Component
 
 The logic of our component is centralized, enabling its reuse in diverse scenarios. It's crucial for this functionality to be reliable. Thus, comprehensive testing becomes imperative. The good news is, testing such behavior is straightforward.
@@ -402,6 +406,187 @@ it("select item using keyboard navigation", async () => {
 ```
 
 The test ensures that users can select items from the dropdown using keyboard inputs. After rendering the `SimpleDropdown` and clicking on its trigger button, the dropdown is focused. Subsequently, the test simulates a keyboard arrow-down press to navigate to the first item and an enter press to select it. The test then verifies if the selected item displays the expected text.
+
+While utilizing custom hooks for Headless Components is common, it's not the sole approach. In fact, before the advent of hooks, developers employed render props or higher-order components to implement Headless Components. Nowadays, even though higher-order components have lost some of their previous popularity, a declarative API employing React context remains relatively well-liked.
+
+## Declarative Headless Component with context API
+
+I'll showcase an alternate declarative method to attain a similar outcome, employing the React context API in this instance. By establishing a hierarchy within the component tree and making each component replaceable, we can offer users a valuable interface that not only functions effectively (supporting keyboard navigation, accessibility, etc.), but also provides the flexibility to customize their own components.
+
+```tsx
+const HeadlessDropdownUsage = ({ items }: { items: Item[] }) => {
+  return (
+    <Dropdown items={items}>
+      <Dropdown.Trigger as={Trigger}>Select an option</Dropdown.Trigger>
+      <Dropdown.List as={CustomList}>
+        {items.map((item, index) => (
+          <Dropdown.Option
+            index={index}
+            key={index}
+            item={item}
+            as={CustomListItem}
+          />
+        ))}
+      </Dropdown.List>
+    </Dropdown>
+  );
+};
+```
+
+The `HeadlessDropdownUsage` component takes an `items` prop of type array of `Item` and returns a `Dropdown` component. Inside `Dropdown`, it defines a `Dropdown.Trigger` to render a `CustomTrigger` component, a `Dropdown.List` to render a `CustomList` component, and maps through the `items` array to create a `Dropdown.Option` for each item, rendering a `CustomListItem` component. 
+
+This structure enables a flexible, declarative way of customizing the rendering and behavior of the dropdown menu while keeping a clear hierarchical relationship between the components. Please observe that the components `Dropdown.Trigger`, `Dropdown.List`, and `Dropdown.Option` supply unstyled default HTML elements (button, ul, and li respectively). They each accept an `as` prop, enabling users to customize components with their own styles and behaviors.
+
+For example, we can define these customised component and use it as above.
+
+```tsx
+const CustomTrigger = ({
+  onClick,
+  ...props
+}: { onClick: () => void } & React.HTMLAttributes<HTMLButtonElement>) => (
+  <button className="trigger" onClick={onClick} {...props} />
+);
+
+const CustomList = ({ ...props }: { [key: string]: any }) => (
+  <div {...props} className="dropdown-menu" />
+);
+
+const CustomListItem = ({ ...props }: { [key: string]: any }) => (
+  <div {...props} className="item-container" />
+);
+```
+
+![Declarative User Interface with customised elements](images/declarative-ui.png)
+
+The implementation isn't complicated. We can simply define a context in `Dropdown` (the root element) and put all the states need to be managed inside, and use that context in the children nodes so they can access the states (or change these states via APIs in the context).
+
+```tsx
+type DropdownContextType<T> = {
+  isOpen: boolean;
+  toggleDropdown: () => void;
+  selectedIndex: number;
+  selectedItem: T | null;
+  updateSelectedItem: (item: T) => void;
+  getAriaAttributes: () => any;
+  dropdownRef: RefObject<HTMLElement>;
+};
+
+function createDropdownContext<T>() {
+  return createContext<DropdownContextType<T> | null>(null);
+}
+
+const DropdownContext = createDropdownContext();
+
+export const useDropdownContext = () => {
+  const context = useContext(DropdownContext);
+  if (!context) {
+    throw new Error("Components must be used within a <Dropdown/>");
+  }
+  return context;
+};
+```
+The code defines a generic `DropdownContextType` type, and a `createDropdownContext` function to create a context with this type. `DropdownContext` is created using this function. `useDropdownContext` is a custom hook that accesses this context, throwing an error if it's used outside of a `<Dropdown/>` component, ensuring proper usage within the desired component hierarchy.
+
+Then we can define components that use the context. We can start with the context provider:
+
+```tsx
+const HeadlessDropdown = <T extends { text: string }>({
+  children,
+  items,
+}: {
+  children: React.ReactNode;
+  items: T[];
+}) => {
+  const {
+    isOpen,
+    toggleDropdown,
+    selectedIndex,
+    selectedItem,
+    updateSelectedItem,
+    getAriaAttributes,
+    dropdownRef,
+  } = useDropdown(items);
+
+  return (
+    <DropdownContext.Provider
+      value={{
+        isOpen,
+        toggleDropdown,
+        selectedIndex,
+        selectedItem,
+        updateSelectedItem,
+      }}
+    >
+      <div
+        ref={dropdownRef as RefObject<HTMLDivElement>}
+        {...getAriaAttributes()}
+      >
+        {children}
+      </div>
+    </DropdownContext.Provider>
+  );
+};
+```
+
+The `HeadlessDropdown` component takes two props: `children` and `items`, and utilizes a custom hook `useDropdown` to manage its state and behavior. It provides a context via `DropdownContext.Provider` to share state and behavior with its descendants. Within a `div`, it sets a ref and applies ARIA attributes for accessibility, then renders its `children` to display the nested components, enabling a structured and customizable dropdown functionality.
+
+Note how we use `useDropdown` hook we defeind in the previous section, and then pass these values down to the children of `HeadlessDropdown`. Following this, we can define the child components:
+
+```tsx
+type GenericComponentType = {
+  as?: string | React.ComponentType<any>;
+  [key: string]: any;
+};
+
+HeadlessDropdown.Trigger = function Trigger({
+  as: Component = "button",
+  ...props
+}: GenericComponentType) {
+  const { toggleDropdown } = useDropdownContext();
+
+  return <Component tabIndex={0} onClick={toggleDropdown} {...props} />;
+};
+
+HeadlessDropdown.List = function List({
+  as: Component = "ul",
+  ...props
+}: GenericComponentType) {
+  const { isOpen } = useDropdownContext();
+
+  return isOpen ? <Component {...props} role="listbox" tabIndex={0} /> : null;
+};
+
+HeadlessDropdown.Option = function Option({
+  as: Component = "li",
+  index,
+  item,
+  ...props
+}: GenericComponentType) {
+  const { updateSelectedItem, selectedIndex } = useDropdownContext();
+
+  return (
+    <Component
+      role="option"
+      aria-selected={index === selectedIndex}
+      key={index}
+      onClick={() => updateSelectedItem(item)}
+      {...props}
+    >
+      {item.text}
+    </Component>
+  );
+};
+```
+
+We defined a type `GenericComponentType` to handle a component or an HTML tag along with any additional properties. Three functions `HeadlessDropdown.Trigger`, `HeadlessDropdown.List`, and `HeadlessDropdown.Option` are defined to render respective parts of a dropdown menu. Each function utilizes the `as` prop to allow custom rendering of a component, and spreads additional properties onto the rendered component. They all access shared state and behavior via `useDropdownContext`. 
+
+- `HeadlessDropdown.Trigger` renders a button by default that toggles the dropdown menu. 
+- `HeadlessDropdown.List` renders a list container if the dropdown is open.
+- `HeadlessDropdown.Option` renders individual list items and updates the selected item when clicked. 
+
+These functions collectively allow a customizable and accessible dropdown menu structure. 
+
+It largely boils down to user preference on how they choose to utilize the Headless Component in their codebase. Personally, I lean towards hooks as they don't involve any DOM (or virtual DOM) interactions; the sole bridge between the shared state logic and UI is the ref object. On the other hand, with the context-based implementation, a default implementation will be provided when the user decides to not customize it.
 
 In the upcoming example, I'll demonstrate how effortlessly we can transition to a different UI while retaining the core functionality.
 
