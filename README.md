@@ -407,7 +407,7 @@ it("select item using keyboard navigation", async () => {
 
 The test ensures that users can select items from the dropdown using keyboard inputs. After rendering the `SimpleDropdown` and clicking on its trigger button, the dropdown is focused. Subsequently, the test simulates a keyboard arrow-down press to navigate to the first item and an enter press to select it. The test then verifies if the selected item displays the expected text.
 
-While utilizing custom hooks for Headless Components is common, it's not the sole approach. In fact, before the advent of hooks, developers employed render props or higher-order components to implement Headless Components. Nowadays, even though higher-order components have lost some of their previous popularity, a declarative API employing React context remains relatively well-liked.
+While utilizing custom hooks for Headless Components is common, it's not the sole approach. In fact, before the advent of hooks, developers employed render props or Higher-Order Components to implement Headless Components. Nowadays, even though Higher-Order Components have lost some of their previous popularity, a declarative API employing React context continues to be fairly favoured.
 
 ## Declarative Headless Component with context API
 
